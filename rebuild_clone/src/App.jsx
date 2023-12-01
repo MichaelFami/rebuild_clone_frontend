@@ -6,7 +6,6 @@ import "./App.css";
 function App() {
   return (
     <div>
-      {/* <Map width={10} height={10} /> */}
       <PhaserGame />
     </div>
   );
