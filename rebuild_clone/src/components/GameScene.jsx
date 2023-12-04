@@ -5,6 +5,7 @@ import Bullet from './Bullet';
 import Zombie from './Zombie';
 import * as CharacterManager from './CharacterManager';
 import * as ZombieManager from './ZombieManager';
+import createBuildingDashboard from './BuildingDashboard'; // Import the building dashboard
 
 export default class GameScene extends Phaser.Scene {
     constructor() {
@@ -17,9 +18,7 @@ export default class GameScene extends Phaser.Scene {
     }
 
     preload() {
-        this.load.spritesheet('character', '/WerewolfStalkerIdleSide.png', { frameWidth: 16, frameHeight: 16 });
-        this.load.spritesheet('secondCharacter', '/SwampTrollIdleSide.png', { frameWidth: 16, frameHeight: 16 });
-        this.load.image('zombie', 'path/to/zombie.png');
+        // ...preload assets...
     }
 
     create() {
@@ -33,7 +32,7 @@ export default class GameScene extends Phaser.Scene {
                 ).setOrigin(0, 0);
             }
         }
-
+        
         this.playerHQ = this.add.rectangle(
             (GRID_WIDTH / 2 - 1) * CELL_SIZE, 
             (GRID_HEIGHT - 5) * CELL_SIZE,    
@@ -89,6 +88,12 @@ export default class GameScene extends Phaser.Scene {
                 this.targets[selectedIndex] = { x: pointer.x, y: pointer.y };
             }
         });
+
+        // Create the building dashboard
+        const dashboardOffsetX = GRID_WIDTH * CELL_SIZE + 50; // Gap of 50 pixels
+        const dashboardWidth = 200; // Width of the dashboard
+        const buildingSize = 50; // Size of each building option
+        createBuildingDashboard(this, dashboardOffsetX, 50, dashboardWidth, buildingSize);
     }
 
     update() {

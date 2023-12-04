@@ -7,8 +7,8 @@ const PhaserGame = () => {
     useEffect(() => {
         const config = {
             type: Phaser.AUTO,
-            width: 900,
-            height: 900,
+            width: 1000,
+            height: 800,
             parent: 'phaser-example',
             scene: [GameScene],
             physics: {
