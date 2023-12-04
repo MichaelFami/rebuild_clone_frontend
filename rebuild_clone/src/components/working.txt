@@ -1,0 +1,43 @@
+placeBuilding(pointer) {
+        const canPlaceHere = this.canPlaceBuilding(pointer.x, pointer.y);
+
+        if (canPlaceHere && this.ghostBuilding && !this.ghostBuilding.isBeingDragged) {
+            let building = this.add.rectangle(pointer.x, pointer.y, 50, 50, 0xffffff);
+            building.health = 100;
+            building.key = this.ghostBuilding.key;
+
+            this.time.addEvent({
+                delay: 1000,
+                callback: () => {
+                    if (building.active) {
+                        this.fireBullet(building.x, building.y);
+                    }
+                },
+                loop: true
+            });
+
+            this.placedBuildings.push(building);
+
+            this.ghostBuilding.destroy();
+            this.ghostBuilding = null;
+        }
+    }
+
+    fireBullet(x, y) {
+        let bullet = this.bullets.get(x, y - 16);
+        if (bullet) {
+            bullet.fire(x, y - 16);  // Adjust bullet firing direction and position as needed
+        }
+    }
+
+    canPlaceBuilding(x, y) {
+        const isWithinPlaceableArea = y > GRID_HEIGHT * CELL_SIZE * 0.7;
+
+        for (let placedBuilding of this.placedBuildings) {
+            if (Phaser.Geom.Intersects.RectangleToRectangle(placedBuilding.getBounds(), new Phaser.Geom.Rectangle(x, y, 50, 50))) {
+                return false;
+            }
+        }
+
+        return isWithinPlaceableArea;
+    }

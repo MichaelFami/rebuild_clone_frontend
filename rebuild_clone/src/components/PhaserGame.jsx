@@ -1,5 +1,4 @@
-// PhaserGame.js
-import React, { useEffect } from 'react';
+import  { useEffect } from 'react';
 import Phaser from 'phaser';
 import GameScene from './GameScene.jsx';
 
@@ -7,7 +6,7 @@ const PhaserGame = () => {
     useEffect(() => {
         const config = {
             type: Phaser.AUTO,
-            width: 1000,
+            width: 1400,
             height: 800,
             parent: 'phaser-example',
             scene: [GameScene],

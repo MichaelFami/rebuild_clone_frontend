@@ -1,4 +1,3 @@
-// CharacterManager.js
 import { CELL_SIZE } from './Config';
 
 export function createCharacter(scene, x, y, spriteKey) {
