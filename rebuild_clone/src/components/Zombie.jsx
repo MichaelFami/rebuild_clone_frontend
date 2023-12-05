@@ -1,17 +1,20 @@
 // Zombie.js
-import Phaser from 'phaser';
-import { CELL_SIZE } from './Config'; // Import CELL_SIZE if it's used in this file
+import Phaser from "phaser";
+import { GRID_WIDTH, CELL_SIZE } from './Config';
 
 export default class Zombie extends Phaser.GameObjects.Sprite {
     constructor(scene, x, y) {
         super(scene, x, y, 'zombie');
         this.scene = scene;
-        this.moveSpeed = 50;
         this.isActive = false;
-        this.attackRate = 1000; // 1 attack per second
-        this.attackDamage = 10;
         this.lastAttackTime = 0;
-        this.health = 10; // Set initial health for the zombie
+        this.attackRate = 1000;  // 1 second between successful attacks
+        this.health = 10;
+        this.attackDamage = 10;
+        this.moveSpeed = 50;
+
+        this.attackAttemptRate = 1000;  // 1 second between attack attempts
+        this.lastAttackAttemptTime = 0;
 
         scene.physics.world.enable(this);
         scene.add.existing(this);
@@ -25,30 +28,21 @@ export default class Zombie extends Phaser.GameObjects.Sprite {
     update(time, delta) {
         if (!this.isActive) return;
 
-        // Determine target based on proximity to characters, buildings, and player HQ
+        const now = this.scene.time.now;
         const target = this.findNearestTarget();
-        if (target) {
+        if (target && now > this.lastAttackAttemptTime + this.attackAttemptRate) {
             this.moveTowardTarget(target);
             this.attackIfInRange(target);
+            this.lastAttackAttemptTime = now;
         }
     }
 
     findNearestTarget() {
-        const allTargets = [...this.scene.characters, ...this.scene.placedBuildings, this.scene.playerHQ];
-        let closestTarget = null;
-        let closestDistance = Infinity;
-
-        allTargets.forEach(target => {
-            if (target.active) {
-                let distance = Phaser.Math.Distance.Between(this.x, this.y, target.x, target.y);
-                if (distance < closestDistance) {
-                    closestDistance = distance;
-                    closestTarget = target;
-                }
-            }
-        });
-
-        return closestTarget;
+        return [...this.scene.characters, ...this.scene.placedBuildings, this.scene.playerHQ].reduce((closest, target) => {
+            if (!target.active) return closest;
+            let distance = Phaser.Math.Distance.Between(this.x, this.y, target.x, target.y);
+            return distance < (closest.distance || Infinity) ? { target, distance } : closest;
+        }, {}).target;
     }
 
     moveTowardTarget(target) {
@@ -63,20 +57,38 @@ export default class Zombie extends Phaser.GameObjects.Sprite {
     }
 
     attack(target) {
+        console.log("Before attack - Zombie instance:", this instanceof Zombie);
+        console.log("Attempting attack");
         if (this.scene.time.now > this.lastAttackTime + this.attackRate) {
-            target.health -= this.attackDamage;
+            target.takeDamage(this.attackDamage);
             this.lastAttackTime = this.scene.time.now;
-            if (target.health <= 0) {
-                target.destroy();
-            }
         }
+        console.log("After attack - Zombie instance:", this instanceof Zombie);
+
     }
 
-    // Call this method when a zombie is hit by a bullet
     takeDamage(damage) {
         this.health -= damage;
         if (this.health <= 0) {
             this.destroy();
+            return true; // Zombie was killed
         }
+        return false; // Zombie is still alive
     }
+}
+
+// Zombie management functions
+
+export function spawnZombie(scene, zombies) {
+    const maxX = GRID_WIDTH * CELL_SIZE;
+    const xPosition = Phaser.Math.Between(0, maxX);
+    let zombie = zombies.get(xPosition, 50, 'zombie');
+    if (zombie) {
+        zombie.activate();
+        console.log("Spawned zombie:", zombie, "Zombie instance:", zombie instanceof Zombie);
+    }
+}
+
+export function updateZombies(zombies) {
+    zombies.getChildren().forEach(zombie => zombie.update());
 }

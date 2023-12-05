@@ -20,6 +20,11 @@ export default class Bullet extends Phaser.GameObjects.Sprite {
 
     // Updates the position of the bullet each frame
     update(time, delta) {
+        // If the bullet is not active, skip updating its position
+        if (!this.active) {
+            return;
+        }
+
         this.y -= this.speed * delta / 1000;
 
         // Check if the bullet has left the game area
@@ -28,5 +33,13 @@ export default class Bullet extends Phaser.GameObjects.Sprite {
             this.setActive(false);
             this.setVisible(false);
         }
+    }
+
+    // Call this method to deactivate the bullet
+    hitTarget() {
+        this.setActive(false);
+        this.setVisible(false);
+        this.body.enable = false; // Disable the physics body
+        console.log(`Bullet deactivated`);
     }
 }

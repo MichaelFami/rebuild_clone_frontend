@@ -1,10 +1,20 @@
 // BuildingManager.js
+
 export class Building {
     constructor(scene, x, y, key) {
         this.scene = scene;
         this.building = scene.add.rectangle(x, y, 50, 50, getBuildingColor(key));
         this.building.health = 100;
         this.key = key;
+
+        // Add a method to the building for taking damage
+        this.building.takeDamage = function(damage) {
+            this.health -= damage;
+            console.log(`Building took ${damage} damage, new health: ${this.health}`);
+            if (this.health <= 0) {
+                this.destroy();
+            }
+        };
 
         // Set up bullet shooting for the building
         scene.time.addEvent({
@@ -51,7 +61,6 @@ function getBuildingColor(key) {
         'building3': 0x0000ff,
         'building4': 0xffff00,
         'building5': 0xff00ff,
-        
     };
     return colors[key] || 0xffffff; // Default color
 }
