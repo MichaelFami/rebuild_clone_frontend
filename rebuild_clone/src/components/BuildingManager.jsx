@@ -17,22 +17,44 @@ export class Building {
         };
 
         // Set up bullet shooting for the building
+        let fireRate = getFireRate(key);
         scene.time.addEvent({
-            delay: 1000, // 1 second
+            delay: fireRate,
             callback: () => {
                 if (this.building.active) {
-                    this.fireBullet();
+                    this.fireBullet(key);
                 }
             },
             loop: true
         });
     }
 
-    fireBullet() {
+    fireBullet(buildingType) {
+        switch(buildingType) {
+            case 'building1':
+                this.createBullet(-90); // Straight up
+                break;
+            case 'building2':
+            case 'building3':
+            case 'building4':
+            case 'building5':
+                // Fire one bullet straight up and two at 45-degree angles
+                this.createMultipleBullets([-90, -45, -135]);
+                break;
+        }
+    }
+
+    createBullet(angle) {
         let bullet = this.scene.bullets.get(this.building.x, this.building.y - 16);
         if (bullet) {
-            bullet.fire(this.building.x, this.building.y - 16);
+            bullet.fire(this.building.x, this.building.y - 16, angle);
         }
+    }
+
+    createMultipleBullets(angles) {
+        angles.forEach(angle => {
+            this.createBullet(angle);
+        });
     }
 }
 
@@ -63,4 +85,15 @@ function getBuildingColor(key) {
         'building5': 0xff00ff,
     };
     return colors[key] || 0xffffff; // Default color
+}
+
+function getFireRate(key) {
+    const fireRates = {
+        'building1': 1000, // 1 second
+        'building2': 2000, // 2 seconds
+        'building3': 1000, // 1 second
+        'building4': 500,  // half a second
+        'building5': 250   // 10 times per second
+    };
+    return fireRates[key] || 1000; // Default to 1 second if not specified
 }

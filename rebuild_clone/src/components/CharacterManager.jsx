@@ -1,14 +1,18 @@
-// CharacterManager.js
 import { CELL_SIZE } from './Config';
 
 export function createCharacter(scene, x, y, spriteKey) {
+    // Create and scale the character sprite
     let character = scene.physics.add.sprite(x, y, spriteKey).setScale(2);
-    character.health = 100;
 
-    // Add a method to the character for taking damage
+    // Initialize health property for the character
+    character.health = 100;  // Example health value, you can adjust as needed
+
+    // Method to handle taking damage
     character.takeDamage = function(damage) {
-        this.health -= damage;
+        this.health -= damage; // Subtract the damage from the character's health
         console.log(`Character took ${damage} damage, new health: ${this.health}`);
+
+        // If health is zero or below, destroy the character
         if (this.health <= 0) {
             this.destroy();
         }
@@ -17,16 +21,10 @@ export function createCharacter(scene, x, y, spriteKey) {
     return character;
 }
 
-export function updateCharacters(scene, characters, targets) {
-    characters.forEach((character, index) => {
-        // The character destruction check is now handled within the takeDamage method
-        const target = targets[index];
-        if (target && target.x !== undefined && target.y !== undefined) {
-            scene.physics.moveTo(character, target.x, target.y, 30);
-            if (Phaser.Math.Distance.Between(character.x, character.y, target.x, target.y) < 10) {
-                character.body.stop();
-                targets[index] = { x: undefined, y: undefined };
-            }
-        }
+export function updateCharacters(scene, characters) {
+    // Update logic for characters, if needed
+    characters.forEach(character => {
+        // Any character-specific update logic would go here
+        // For example, you might want to update character animations or states
     });
 }

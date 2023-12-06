@@ -6,7 +6,7 @@ const PhaserGame = () => {
     useEffect(() => {
         const config = {
             type: Phaser.AUTO,
-            width: 1400,
+            width: 1100,
             height: 800,
             parent: 'phaser-example',
             scene: [GameScene],

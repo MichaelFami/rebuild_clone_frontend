@@ -12,10 +12,12 @@ export default class Bullet extends Phaser.GameObjects.Sprite {
     }
 
     // Fires a bullet from the player to the target
-    fire(x, y) {
-        this.setPosition(x, y); // Adjust the position as necessary
+    fire(x, y, angle = 0) {
+        this.setPosition(x, y); // Set the position
         this.setActive(true);
         this.setVisible(true);
+        this.body.enable = true;
+        this.body.velocity = this.scene.physics.velocityFromAngle(angle, this.speed); // Set velocity based on angle
     }
 
     // Updates the position of the bullet each frame
@@ -24,8 +26,6 @@ export default class Bullet extends Phaser.GameObjects.Sprite {
         if (!this.active) {
             return;
         }
-
-        this.y -= this.speed * delta / 1000;
 
         // Check if the bullet has left the game area
         if (this.y < 0 || this.y > this.scene.game.config.height ||
