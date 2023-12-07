@@ -43,7 +43,8 @@ export default class GameScene extends Phaser.Scene {
         this.load.image('building3', '/firestation2.png');
         this.load.image('building4', '/policestation.png');
         this.load.image('building5', '/tank.png');
-        this.load.html('usernameForm', './usernameForm.html');
+        this.load.image('playerHQ', '/hq.png'); // Replace with the actual path to your image
+
     }
 
     create() {
@@ -124,10 +125,10 @@ export default class GameScene extends Phaser.Scene {
     }
 
     handleSpacebarPress() {
-        if (this.isGameOver || !this.selectedCharacter) return;
+        if (this.isGameOver || !this.selectedCharacter || !this.selectedCharacter.active) return;
         let bullet = this.bullets.get();
         if (bullet) {
-            bullet.fire(this.selectedCharacter.x, this.selectedCharacter.y);
+            bullet.fire(this.selectedCharacter.x, this.selectedCharacter.y, -90); // Fire bullet upwards
         }
     }
 
@@ -246,6 +247,28 @@ export default class GameScene extends Phaser.Scene {
     
 }
 function saveScoreToDatabase(username, score) {
-    // Implement the logic to save the score and username to your database.
-    console.log(`Saving score: ${score}, Username: ${username}`);
+    // Define the URL where the POST request will be sent
+    const url = 'http://localhost:3001/score';
+
+    // Create the data object to be sent
+    const data = {
+        username: username,
+        score: score
+    };
+
+    // Use fetch to send a POST request
+    fetch(url, {
+        method: 'POST', // Specify the method
+        headers: {
+            'Content-Type': 'application/json', // Specify the content type
+        },
+        body: JSON.stringify(data) // Convert the JavaScript object to a JSON string
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Success:', data); // Log success response
+    })
+    .catch((error) => {
+        console.error('Error:', error); // Log any errors
+    });
 }

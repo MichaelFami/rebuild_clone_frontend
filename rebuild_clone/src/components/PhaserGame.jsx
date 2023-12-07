@@ -15,7 +15,7 @@ const PhaserGame = () => {
             physics: {
                 default: 'arcade',
                 arcade: {
-                    debug: true
+                    debug: false
                 }
             }
         };
@@ -44,11 +44,11 @@ const PhaserGame = () => {
         <div className="game-container">
             <div id="leaderboard">
                 <h2>Leaderboard</h2>
-                <ul>
+                <ol>
                     {leaderboard.map((entry, index) => (
                         <li key={index}>{entry.username}: {entry.score}</li>
                     ))}
-                </ul>
+                </ol>
             </div>
             <div id="phaser-canvas" />
         </div>

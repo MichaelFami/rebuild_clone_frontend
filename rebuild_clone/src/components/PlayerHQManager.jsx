@@ -1,14 +1,15 @@
 import { GRID_WIDTH, GRID_HEIGHT, CELL_SIZE, CELL_SPACING } from './Config';
 
 export function createPlayerHQ(scene) {
-    let playerHQ = scene.add.rectangle(
+    let playerHQ = scene.physics.add.sprite(
         (GRID_WIDTH / 2 - 1) * CELL_SIZE, 
         (GRID_HEIGHT - 5) * CELL_SIZE,    
-        2 * CELL_SIZE,     
-        2 * CELL_SIZE,     
-        0xff0000                          
+        'playerHQ' // Use the key of the preloaded image
     ).setOrigin(0, 0);
+
     playerHQ.health = 500;
+    playerHQ.setScale(.1, .1)
+    playerHQ.setDepth(1); // Set the size of the sprite
 
     // Add a method to the playerHQ for taking damage
     playerHQ.takeDamage = function(damage) {
@@ -20,7 +21,6 @@ export function createPlayerHQ(scene) {
     };
 
     // Add playerHQ to the physics world for collision detection
-    scene.physics.world.enable(playerHQ);
     playerHQ.body.setImmovable(true);
 
     return playerHQ;
