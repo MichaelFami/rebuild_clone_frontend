@@ -8,8 +8,9 @@ import { createPlayerHQ } from './PlayerHQManager';
 import { placeBuilding } from './BuildingManager';
 
 export default class GameScene extends Phaser.Scene {
-    constructor() {
+    constructor(restartGameCallback) {
         super('GameScene');
+        this.restartGameCallback = restartGameCallback;
         this.score = 0;
         this.gold = 400;
         this.hqHealthText = null;
@@ -193,17 +194,18 @@ export default class GameScene extends Phaser.Scene {
         this.isGameOver = true;
         this.physics.pause();
     
+        // Game Over Text
         this.add.text(this.cameras.main.centerX, this.cameras.main.centerY - 80, 'Game Over', { fontSize: '40px', fill: '#fff' }).setOrigin(0.5);
     
+        // Reset game variables
         this.zombieSpawnCount = 1;
         this.nextDoubleTime = ZOMBIE_DOUBLE_INTERVAL;
-
         if (this.bullets) this.bullets.clear(true, true);
         if (this.zombies) this.zombies.clear(true, true);
         this.characters = []; // Reinitialize or clear characters
-    this.placedBuildings = []; // Reinitialize or clear buildings
-
-
+        this.placedBuildings = []; // Reinitialize or clear buildings
+    
+        // Create an input element for the username
         const usernameInput = document.createElement('input');
         usernameInput.type = 'text';
         usernameInput.placeholder = 'Username';
@@ -213,6 +215,7 @@ export default class GameScene extends Phaser.Scene {
         usernameInput.style.transform = 'translate(-50%, -50%)';
         document.body.appendChild(usernameInput);
     
+        // Create a button to save the score and restart the game
         const saveButton = document.createElement('button');
         saveButton.textContent = 'Save Score And Try Again';
         saveButton.style.position = 'absolute';
@@ -221,16 +224,20 @@ export default class GameScene extends Phaser.Scene {
         saveButton.style.transform = 'translate(-50%, -50%)';
         document.body.appendChild(saveButton);
     
+        // Event listener for the save button
         saveButton.addEventListener('click', () => {
             const username = usernameInput.value;
             saveScoreToDatabase(username, this.score);
     
+            // Clean up HTML elements
             usernameInput.remove();
             saveButton.remove();
     
-            this.scene.start('GameScene');
+            // Reload the entire web page
+            window.location.reload();
         });
     }
+    
     
     
 
