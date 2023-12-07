@@ -84,7 +84,7 @@ export default class Zombie extends Phaser.GameObjects.Sprite {
 // Function to spawn zombies
 export function spawnZombie(scene, zombies) {
     const xPosition = Phaser.Math.Between(0, GRID_WIDTH * CELL_SIZE);
-    let zombie = zombies.get(xPosition, 0, 'zombie');
+    let zombie = zombies.get(xPosition, 50, 'zombie');
     if (zombie) {
         zombie.activate();
     }

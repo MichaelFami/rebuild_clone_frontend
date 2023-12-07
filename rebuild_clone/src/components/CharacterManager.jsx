@@ -2,7 +2,7 @@ import { CELL_SIZE } from './Config';
 
 export function createCharacter(scene, x, y, spriteKey) {
     // Create and scale the character sprite
-    let character = scene.physics.add.sprite(x, y, spriteKey).setScale(2);
+    let character = scene.physics.add.sprite(x, y, spriteKey).setScale(.05);
 
     // Initialize health property for the character
     character.health = 100;  // Example health value, you can adjust as needed

@@ -1,9 +1,15 @@
 // BuildingManager.js
+import Phaser from 'phaser';
 
 export class Building {
     constructor(scene, x, y, key) {
         this.scene = scene;
-        this.building = scene.add.rectangle(x, y, 50, 50, getBuildingColor(key));
+        this.building = scene.physics.add.sprite(x, y, key).setOrigin(0.5, 0.5);
+
+        // Adjust scale based on the building type
+        const buildingScale = getBuildingScale(key);
+        this.building.setScale(buildingScale);
+
         this.building.health = 100;
         this.key = key;
 
@@ -76,15 +82,18 @@ function canPlaceBuilding(scene, x, y) {
     return isWithinPlaceableArea && !overlap;
 }
 
-function getBuildingColor(key) {
-    const colors = {
-        'building1': 0xff0000,
-        'building2': 0x00ff00,
-        'building3': 0x0000ff,
-        'building4': 0xffff00,
-        'building5': 0xff00ff,
+
+
+function getBuildingScale(key) {
+    const buildingScales = {
+        'building1': .08, // Example scale for building1
+        'building2': .1, // Example scale for building2
+        'building3': .08, // Example scale for building3
+        'building4': .08, // Example scale for building3
+        'building5': .08, // Example scale for building3
+        // Add scales for other buildings as needed
     };
-    return colors[key] || 0xffffff; // Default color
+    return buildingScales[key] || 1.0; // Default scale if not specified
 }
 
 function getFireRate(key) {

@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { GRID_WIDTH, GRID_HEIGHT, CELL_SIZE, CELL_SPACING, ZOMBIE_SPAWN_RATE, ZOMBIE_DOUBLE_INTERVAL } from './Config';
 import Bullet from './Bullet';
-import Zombie, { spawnZombie, updateZombies } from './Zombie';  // Import Zombie related functionality
+import Zombie, { spawnZombie, updateZombies } from './Zombie';
 import * as CharacterManager from './CharacterManager';
 import { createBuildingDashboard } from './BuildingDashboard';
 import { createPlayerHQ } from './PlayerHQManager';
@@ -33,18 +33,22 @@ export default class GameScene extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image('cityOverlay', '/background2.png');
-
-        this.load.spritesheet('character', '/Werewolf.png', { frameWidth: 16, frameHeight: 16 });
-        this.load.image('bullet', '/path/to/bullet.png');
+        this.load.image('cityOverlay', '/background4.png');
+        this.load.image('character', '/soldier.png');
+        this.load.spritesheet('bullet', '/bullet2.png', { frameWidth: 16, frameHeight: 16 });
         this.load.spritesheet('zombie', '/SwampTroll.png', { frameWidth: 16, frameHeight: 16 });
+        this.load.image('building1', '/4wheeler.png');
+        this.load.image('building2', '/van1.png');
+        this.load.image('building3', '/firestation2.png');
+        this.load.image('building4', '/policestation.png');
+        this.load.image('building5', '/tank.png');
+        this.load.html('usernameForm', './usernameForm.html');
     }
 
     create() {
         this.events.on('buildingSelected', this.handleBuildingSelection, this);
         this.createGameArea();
         this.playerHQ = createPlayerHQ(this);
-
         this.scoreText = this.add.text(10, 10, 'Score: 0', { fontSize: '16px', fill: '#fff' });
         this.resourcesText = this.add.text(200, 10, 'Gold: 400', { fontSize: '16px', fill: '#fff' });
         this.cityOverlay = this.add.image(0, 50, 'cityOverlay').setOrigin(0, 0);
@@ -57,11 +61,18 @@ export default class GameScene extends Phaser.Scene {
 
         this.hqHealthText = this.add.text(healthTextX, healthTextY, 'HQ Health: 500', { fontSize: '16px', fill: '#fff' });
 
-
         this.characters = [CharacterManager.createCharacter(this, characterX, characterY, 'character')];
-        this.bullets = this.physics.add.group({ classType: Bullet, maxSize: 200, runChildUpdate: true });
 
+       
+        this.bullets = this.physics.add.group({ classType: Bullet, maxSize: 200, runChildUpdate: true });
+        this.zombieSpawnCount = 1;
+        this.nextDoubleTime = this.time.now + ZOMBIE_DOUBLE_INTERVAL;
+    
+       
+      
         this.zombies = this.physics.add.group({ classType: Zombie, maxSize: 100, runChildUpdate: true });
+        
+
 
         this.time.addEvent({
             delay: ZOMBIE_SPAWN_RATE,
@@ -70,11 +81,11 @@ export default class GameScene extends Phaser.Scene {
         });
 
         this.physics.add.collider(this.bullets, this.zombies, (bullet, zombie) => {
-            bullet.hitTarget(); // Assuming this deactivates the bullet
+            bullet.hitTarget();
             if (zombie.takeDamage(10)) {
-                this.gold += 5; // Add gold for killing a zombie
-                this.score += 5; // Increase score for killing a zombie
-                this.updateScoreAndResources(); // Update score and gold display
+                this.gold += 5;
+                this.score += 5;
+                this.updateScoreAndResources();
             }
         });
 
@@ -172,44 +183,62 @@ export default class GameScene extends Phaser.Scene {
             this.gameOver();
         }
     }
-
-    gameOver() {
-        this.isGameOver = true;
-        this.physics.pause();
-    
-        // Create a black rectangle background for the game over text and button
-        let gameOverBackground = this.add.rectangle(
-            this.cameras.main.centerX, 
-            this.cameras.main.centerY, 
-            400, 200, 
-            0x000000
-        ).setOrigin(0.5);
-    
-        // Add 'Game Over You Lose' text
-        this.add.text(
-            this.cameras.main.centerX, 
-            this.cameras.main.centerY - 40, 
-            'Game Over You Lose', 
-            { fontSize: '32px', fill: '#fff' }
-        ).setOrigin(0.5);
-    
-        // Add 'Try Again' button
-        const tryAgainButton = this.add.text(
-            this.cameras.main.centerX, 
-            this.cameras.main.centerY + 40, 
-            'Try Again', 
-            { fontSize: '24px', fill: '#00ff00' }
-        ).setOrigin(0.5).setInteractive();
-    
-        // Handle click on the 'Try Again' button
-        tryAgainButton.on('pointerdown', () => {
-            this.scene.restart();
-        });
-    }
-
     spawnZombies() {
         for (let i = 0; i < this.zombieSpawnCount; i++) {
             spawnZombie(this, this.zombies);
         }
     }
+
+    gameOver() {
+        this.isGameOver = true;
+        this.physics.pause();
+    
+        this.add.text(this.cameras.main.centerX, this.cameras.main.centerY - 80, 'Game Over', { fontSize: '40px', fill: '#fff' }).setOrigin(0.5);
+    
+        this.zombieSpawnCount = 1;
+        this.nextDoubleTime = ZOMBIE_DOUBLE_INTERVAL;
+
+        if (this.bullets) this.bullets.clear(true, true);
+        if (this.zombies) this.zombies.clear(true, true);
+        this.characters = []; // Reinitialize or clear characters
+    this.placedBuildings = []; // Reinitialize or clear buildings
+
+
+        const usernameInput = document.createElement('input');
+        usernameInput.type = 'text';
+        usernameInput.placeholder = 'Username';
+        usernameInput.style.position = 'absolute';
+        usernameInput.style.top = '50%';
+        usernameInput.style.left = '50%';
+        usernameInput.style.transform = 'translate(-50%, -50%)';
+        document.body.appendChild(usernameInput);
+    
+        const saveButton = document.createElement('button');
+        saveButton.textContent = 'Save Score And Try Again';
+        saveButton.style.position = 'absolute';
+        saveButton.style.top = '55%';
+        saveButton.style.left = '50%';
+        saveButton.style.transform = 'translate(-50%, -50%)';
+        document.body.appendChild(saveButton);
+    
+        saveButton.addEventListener('click', () => {
+            const username = usernameInput.value;
+            saveScoreToDatabase(username, this.score);
+    
+            usernameInput.remove();
+            saveButton.remove();
+    
+            this.scene.start('GameScene');
+        });
+    }
+    
+    
+
+    
+
+    
+}
+function saveScoreToDatabase(username, score) {
+    // Implement the logic to save the score and username to your database.
+    console.log(`Saving score: ${score}, Username: ${username}`);
 }
